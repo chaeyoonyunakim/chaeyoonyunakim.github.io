@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: posts
 title: "A Junior Data Scientist’s Day"
 date: 2023-08-07 14:30:00 +0100
 categories: presentation
