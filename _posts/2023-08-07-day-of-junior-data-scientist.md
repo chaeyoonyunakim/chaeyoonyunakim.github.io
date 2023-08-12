@@ -45,9 +45,18 @@ Whilst `programming` can include `data processing`, I primarily used robust data
 
 At work, I sometimes had a strategic decision not to handle the `review` or `reporting part` of that specific project as stated in the table. This choice was agreed within the team. When other priorities required my immediate attention, I was able to pass all my model ideas and findings (with my thanks) to the other contributors who were working on the same project. That is certainly different from how I used to carry my own responsibilities for the university courseworks; <mark style="background-color: Cornsilk">the team needs me for team-work!</mark>
 
-These differences highlight how an individual's tech skill requirements to meet task commitments vary in terms of their collaborative level, especially the more if working in the wider group.
+These differences highlight how an individual's tech skill requirements to meet task commitments vary in terms of their collaborative level.
 
 ## Why 50% in data processing?
+
+It happens to me, especially the more if working in the wider group project settings where multiple data collection points and interactions with diverse feedback loops are more frequent occurrences. For example, the project A aims to produce a distributional guide of human resource (medical professionals) for NHS England regions based on multiple factors such as demography, morbidity, deprivation, and demand projections. Following list of datasets are the required reference sources for the project A:
+
+- Demography: [ONS Clinical commissioning group population estimates](https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/clinicalcommissioninggroupmidyearpopulationestimates), GP practice weighted populations
+- Morbidity: [Trends in the burden of morbidity](<https://www.gov.uk/government/publications/health-profile-for-england-2018/chapter-3-trends-in-morbidity-and-risk-factors#:~:text=The%20total%20burden%20of%20morbidity%2C%20measured%20by%20the%20total%20number,2.1%25%20(Figure%201)>), [Mortality from accidents: SMR<75 index](https://digital.nhs.uk/data-and-information/publications/statistical/compendium-mortality/current/mortality-from-accidents/mortality-from-accidents-indirectly-standardised-ratio-smr-lt75-years-3-year-average-mfp).
+- Deprivation: [CDRC Index of Multiple Deprivation (IMD)](https://data.cdrc.ac.uk/dataset/index-multiple-deprivation-imd), [Quality and Outcomes Framework (QOF) data](https://qof.digital.nhs.uk/)
+- Demand projections: [Hospital Episode Statistics (HES)](https://digital.nhs.uk/data-and-information/data-tools-and-services/data-services/hospital-episode-statistics), [Specialised Commissioning data](https://www.england.nhs.uk/contact-us/privacy-notice/how-we-use-your-information/our-services/specialised-commissioning/#:~:text=The%20specialised%20services%20that%20we,devices%20and%20Highly%20Specialised%20Services.)
+
+Each datasets would demand delicate works on regional mappings of the national data to the NHS's [42 Integrated Care Boards (ICBs)](https://www.england.nhs.uk/integratedcare/integrated-care-in-your-area/) or their sub-locations. Additionally, a certain specific types of information such as the count number of the In-Patient & Out-Patient episodes would limit the bottom level data collection. Therefore, given these complexities, it explains that how the considerable amount of the data processing necessitates becomes evident.
 
 ... to be continued
 
