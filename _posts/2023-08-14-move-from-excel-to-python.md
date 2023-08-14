@@ -5,7 +5,7 @@ date: 2023-08-14 12:55:00 +0100
 categories: presentation
 ---
 
-Good afternoon from London :wave:
+Good afternoon from London :wave::wave:
 
 It'll be a nice surprise if I have an audience who underestimates Excel as one of the old-fashioned tools.
 
