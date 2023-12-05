@@ -58,6 +58,8 @@ It happens to me, especially the more if working in the wider group project sett
 
 Each datasets would demand delicate works on regional mappings of the national data to the NHS's [42 Integrated Care Boards (ICBs)](https://www.england.nhs.uk/integratedcare/integrated-care-in-your-area/) or their sub-locations. Additionally, a certain specific types of information such as the count number of the In-Patient & Out-Patient episodes would limit the bottom level data collection. Therefore, given these complexities, it explains that how the considerable amount of the data processing necessitates becomes evident.
 
-... to be continued
+... to be continued on [Youtube](https://youtu.be/q-JZxrDC0ck?si=7qDQaGSxDR8YmFhK&t=10503)
+
+[![Video](https://img.youtube.com/vi/RzbsE9IoD98ntbF9&t/maxresdefault.jpg)](https://youtu.be/q-JZxrDC0ck?si=RzbsE9IoD98ntbF9&t=10503)
 
 <a href="https://www.buymeacoffee.com/chaeyoona" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
