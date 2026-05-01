@@ -1,21 +1,23 @@
-Jekyll Themes
-=============
+# Data Science Journal
 
-A directory of the best-looking themes for Jekyll blogs
+Chaeyoon Kim — Data Scientist based in London.
 
+Built with Jekyll. Custom layout, no external theme dependencies.
 
-Submitting a Theme
-------------------
+## Structure
 
-Have a theme you want to share?
+- `_layouts/` — `default.html` (site shell + CSS), `post.html` (article + LinkedIn redirect)
+- `_posts/` — writing, linked or redirected to LinkedIn Pulse
+- `index.html` — homepage (hero, about, writing)
+- `_config.yml` — site metadata
 
-* Fork the site on GitHub
-* Create a new post in the `_posts` directory and fill out the relevant YAML fields
-* Make a 250x200 thumbnail and drop it in the thumbnails directory. List its filename in the post's markdown file.
-* Test it out, then push your changes up and open a pull request.
+## Adding a post
 
-
-License
--------
-
-The contents of this repository are licensed under the [GNU Public License.](http://www.gnu.org/licenses/gpl-3.0.html)
+```yaml
+---
+layout: post
+title: "Your title"
+date: 2026-01-01
+redirect_to: https://www.linkedin.com/pulse/...  # optional: redirects to LinkedIn
+---
+```
