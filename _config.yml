@@ -1,16 +1,9 @@
-name: Jekyll Themes
-url: http://matt.harzewski.com
-description: Insert tagline here
+title: Chaeyoon Kim
+url: https://chaeyoonyunakim.github.io
+description: Data Scientist at NHS England. Writing about data science, AI, and health.
 
-permalink: /themes/:title/
+permalink: /:year/:month/:day/:title/
 
-plugins: [jekyll-paginate]
-
-highlighter: pygments
-paginate: 20
-
-markdown: rdiscount
-rdiscount:
-    extensions: ['smart']
+plugins: [jekyll-feed]
 
 exclude: ['README.md', 'Gemfile.lock', 'Gemfile', 'Rakefile', 'vendor']

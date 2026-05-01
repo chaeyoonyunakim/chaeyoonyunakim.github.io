@@ -1,38 +1,20 @@
 ---
 layout: default
 ---
-
-<div id="post" class="container">
-
-	<div class="postthumb"><img src="/thumbnails/{{ page.thumbnail }}" /></div>
-
-	<h1>{{ page.title }}</h1>
-
-	<div class="meta clearfix">
-		<strong>Author:</strong> {{ page.author }}
-
-		{% if page.license %}
-			<br /><strong>License:</strong> {{ page.license }}
-		{% endif %}
-
-		<br /><br />
-		{% if page.homepage %}
-			<a class="btn" href="{{ page.homepage }}"><i class="icon-home"></i> Homepage</a>
-		{% endif %}
-		{% if page.download %}
-			<a class="btn" href="{{ page.download }}"><i class="icon-download-alt"></i> Download</a>
-		{% endif %}
-		{% if page.demo %}
-			<a class="btn" href="{{ page.demo }}"><i class="icon-road"></i> Demo</a>
-		{% endif %}
-		{% if page.license_link %}
-			<a class="btn" href="{{ page.license_link }}"><i class="icon-file"></i> License</a>
-		{% endif %}
-	</div>
-
-
-	<div class="post-content">
-	{{ content }}
-	</div>
-
+{% if page.redirect_to %}
+<meta http-equiv="refresh" content="0; url={{ page.redirect_to }}">
+<script>window.location.href = "{{ page.redirect_to }}";</script>
+{% endif %}
+<div class="post-container">
+  <p class="section-label"><a href="/#writing" style="color:inherit;text-decoration:none;">← Writing</a></p>
+  <h1 class="post-page-title">{{ page.title }}</h1>
+  <p class="post-page-meta">{{ page.date | date: "%B %d, %Y" }}</p>
+  {% if page.redirect_to %}
+  <div class="redirect-card">
+    <p class="body-text">This article is published on LinkedIn Pulse.</p>
+    <a class="btn btn-primary" href="{{ page.redirect_to }}" target="_blank">Read on LinkedIn ↗</a>
+  </div>
+  {% else %}
+  <div class="post-body">{{ content }}</div>
+  {% endif %}
 </div>

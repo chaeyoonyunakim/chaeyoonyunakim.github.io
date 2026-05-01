@@ -1,119 +1,332 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ page.title }}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="http://fonts.googleapis.com/css?family=Playball" rel="stylesheet">
-  <link href="/assets/css/jekyllthemes.css" rel="stylesheet" />
-  <link href="/assets/css/syntax.css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if page.title %}{{ page.title }} — {% endif %}{{ site.title | default: "Chaeyoon Kim" }}</title>
+  <meta name="description" content="{{ page.description | default: site.description | default: 'Data Scientist at NHS England' }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #faf7f4;
+      --text: #111111;
+      --muted: #777777;
+      --accent: #c9856a;
+      --border: #e4d8d2;
+      --card-bg: #ffffff;
+      --max-w: 860px;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      border-left: 4px solid var(--accent);
+      border-right: 4px solid var(--accent);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+    }
+    .nav-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+    .nav-logo {
+      font-weight: 900;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* MAIN */
+    main {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* SECTIONS */
+    .section {
+      border-top: 1px solid var(--border);
+      padding: 5rem 0;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .display-heading {
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .section-heading {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .body-text {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 520px;
+    }
+
+    /* TWO-COL */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    /* META GRID */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .meta-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+    .meta-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* POSTS GRID */
+    .posts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    .post-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .post-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 16px rgba(201, 133, 106, 0.12);
+    }
+    .post-meta {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .post-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .post-excerpt {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .post-arrow {
+      margin-top: auto;
+      font-size: 1rem;
+      color: var(--accent);
+    }
+
+    /* BUTTONS */
+    .btn-group {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.25rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+    }
+    .btn-primary:hover { background: var(--accent); }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--text); }
+
+    /* POST PAGE */
+    .post-container {
+      padding: 4rem 0;
+      max-width: 640px;
+    }
+    .post-page-title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 0.75rem;
+    }
+    .post-page-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 2.5rem;
+    }
+    .redirect-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .post-body {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text);
+    }
+    .post-body p { margin-bottom: 1.25rem; }
+    .post-body h2 { font-size: 1.4rem; font-weight: 700; margin: 2rem 0 0.75rem; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+    }
+    .footer-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-copy {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .footer-links a {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .footer-links a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      body { border-left: 2px solid var(--accent); border-right: 2px solid var(--accent); }
+      .two-col { grid-template-columns: 1fr; gap: 2rem; }
+      .posts-grid { grid-template-columns: 1fr; }
+      .meta-grid { grid-template-columns: 1fr 1fr; }
+      nav { padding: 0 1rem; }
+      main { padding: 0 1rem; }
+    }
+  </style>
 </head>
-
-
 <body>
-
-
-
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    ga('create', 'UA-735643-13', 'jekyllthemes.org');
-    ga('send', 'pageview');
-  </script>
-
-
-
-  <header id="header">
-    <div class="wrap">
-
-      <h1 id="logo"><a href="/">{{ site.name }}</a></h1>
-
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-logo" href="/">CK.</a>
+      <ul class="nav-links">
+        <li><a href="/#about">About</a></li>
+        <li><a href="/#writing">Writing</a></li>
+        <li><a href="https://www.linkedin.com/in/chaeyoonyunakim" target="_blank">LinkedIn</a></li>
+      </ul>
     </div>
-  </header>
-
-
-
-  <div id="pagecontainer" class="container">
-
-
-
-    <!--<div class="hero-unit">
-      <p><strong>Need a design for your <a href="http://jekyllrb.com/">Jekyll</a> blog?</strong> Whether you're looking for a fresh theme to drop in and go, or to use as a starting point for customization, you'll find the best ones available right here.</p>
-    </div>-->
-
-
-
-    <div class="widebanner row">
-      <div class="span12">
-        <div class="banner72" id="banner72">
-
-          <script type="text/javascript"><!--
-
-            var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-
-            google_ad_client = "ca-pub-7611360452853908";
-
-            if (width > 769) {
-              google_ad_slot = "6552835850";
-              google_ad_width = 728;
-              google_ad_height = 90;
-            } else {
-              var el = document.getElementById("banner72");
-              el.parentNode.removeChild(el);
-            }
-
-            //-->
-          </script>
-          <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-
-        </div>
-      </div>
-    </div>
-
-
-
-    <div id="content">
-
-
-        {{ content }}
-
-
-    </div>
-
-
-  </div>
-
-
-
-  <footer id="footer">
-    <div class="container">
-      <div class="row">
-
-        <div class="span5 copyright">
-          Copyright &copy; {{ site.time | date: '%Y' }} Matt Harzewski. Powered by <a href="http://jekyllrb.com">Jekyll</a>.
-          <br /><br />
-          <iframe src="http://ghbtns.com/github-btn.html?user=mattvh&repo=jekyllthemes&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
-          <iframe src="http://ghbtns.com/github-btn.html?user=mattvh&repo=jekyllthemes&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
-          <br /><br />
-        </div>
-
-        <div class="span7">
-          <h3>Want to Submit a Theme?</h3>
-          <ul>
-            <li>Fork <a href="https://github.com/mattvh/jekyllthemes" target="_blank">our site</a> on GitHub</li>
-            <li>Create a new post in the <code>_posts</code> directory and fill out the relevant YAML fields</li>
-            <li>Make a 250x200 thumbnail and drop it in the <code>thumbnails</code> directory. List its filename in the post's markdown file.</li>
-            <li>Test it out, then push your changes up and open a pull request.</li>
-          </ul>
-        </div>
-
+  </nav>
+  <main>
+    {{ content }}
+  </main>
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-copy">&copy; {{ site.time | date: "%Y" }} Chaeyoon Kim</span>
+      <div class="footer-links">
+        <a href="https://www.linkedin.com/in/chaeyoonyunakim" target="_blank">LinkedIn</a>
+        <a href="https://github.com/chaeyoonyunakim" target="_blank">GitHub</a>
       </div>
     </div>
   </footer>
-
-
-
 </body>
 </html>
