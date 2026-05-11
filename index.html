@@ -10,7 +10,7 @@ title: Home
   </p>
   <div class="btn-group">
     <a href="https://www.linkedin.com/in/chaeyoonyunakim" class="btn btn-primary" target="_blank">LinkedIn ↗</a>
-    <a href="#writing" class="btn btn-outline">Read my writing</a>
+    <a href="#projects" class="btn btn-outline">View projects</a>
   </div>
 </section>
 
@@ -44,8 +44,70 @@ title: Home
   </div>
 </section>
 
+<section class="section" id="projects">
+  <p class="section-label">02 — Projects</p>
+  <h2 class="section-heading">Selected work.</h2>
+  <div class="projects-grid">
+
+    <!-- Featured: SMART 2021 with poster thumbnail -->
+    <a class="project-card project-card--featured"
+       href="https://github.com/chaeyoonyunakim/smart-2021-at-answer-type-prediction"
+       target="_blank">
+      <div class="project-thumb">
+        <img src="/assets/img/poster-smart2021.jpg"
+             alt="CitySAT poster presented at SMART 2021 / ISWC"
+             loading="lazy">
+      </div>
+      <div class="project-card-body">
+        <span class="project-badge">1st Place</span>
+        <span class="post-meta">Oct 2021 &middot; ISWC &middot; SMART Challenge</span>
+        <span class="post-card-title">Semantic Answer Type Prediction</span>
+        <span class="post-excerpt">MSc dissertation submitted to the SMART 2021 shared task at the International Semantic Web Conference. Ranked 1st for classifying the expected answer type — entity, literal, or boolean — from natural-language questions over a knowledge graph.</span>
+        <span class="post-arrow" style="margin-top:auto;">↗</span>
+      </div>
+    </a>
+
+    <!-- NHS Policy Navigator -->
+    <a class="project-card"
+       href="https://github.com/chaeyoonyunakim/nhs-policy-navigator"
+       target="_blank">
+      <div class="project-card-body">
+        <span class="post-meta">May 2025 &middot; MongoDB Agentic Evolution Hackathon</span>
+        <span class="post-card-title">NHS Policy Navigator</span>
+        <span class="post-excerpt">Adaptive retrieval agent over the NHS 10-Year Health Plan, built in London. Uses agentic RAG to answer nuanced policy questions with source attribution.</span>
+        <span class="post-arrow">↗</span>
+      </div>
+    </a>
+
+    <!-- Reduce Non-Attended Appointments -->
+    <a class="project-card"
+       href="https://github.com/chaeyoonyunakim/hack-the-state-reduce-non-attended-hospital-appointments"
+       target="_blank">
+      <div class="project-card-body">
+        <span class="post-meta">2024 &middot; No. 10 Downing Street Hackathon</span>
+        <span class="post-card-title">Reducing Missed NHS Appointments</span>
+        <span class="post-excerpt">ML solution to cut the cost and waitlist impact of non-attended hospital appointments, developed for a hackathon challenge set by the No. 10 data science team.</span>
+        <span class="post-arrow">↗</span>
+      </div>
+    </a>
+
+    <!-- Heartlink Kiro NHS -->
+    <a class="project-card"
+       href="https://github.com/chaeyoonyunakim/heartlink-kiro-nhs"
+       target="_blank">
+      <div class="project-card-body">
+        <span class="post-meta">2025 &middot; Spec-driven ML</span>
+        <span class="post-card-title">Heartlink — Heart Disease Prediction</span>
+        <span class="post-excerpt">Spec-driven heart disease prediction pipeline with an NHS-styled dashboard. Classification, regression, and clustering on UCI Heart Disease data with clinical guardrails and property-based testing.</span>
+        <span class="post-arrow">↗</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
 <section class="section" id="writing">
-  <p class="section-label">02 — Writing</p>
+  <p class="section-label">03 — Writing</p>
   <h2 class="section-heading">Thoughts on<br>data science.</h2>
   <div class="posts-grid">
     {% for post in site.posts %}
