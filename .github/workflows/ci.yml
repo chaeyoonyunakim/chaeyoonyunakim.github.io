@@ -22,3 +22,26 @@ jobs:
 
       - name: Check output exists
         run: test -f _site/index.html
+
+      - name: Check project thumbnails
+        run: |
+          failed=0
+          for file in _projects/*.md; do
+            thumb=$(grep '^thumb:' "$file" | sed 's/^thumb:[[:space:]]*"\(.*\)"/\1/')
+            [ -z "$thumb" ] && continue
+            if [[ "$thumb" == http* ]]; then
+              echo "Checking external: $thumb"
+              if ! curl --silent --fail --location --head --max-time 15 "$thumb"; then
+                echo "FAIL: unreachable — $thumb"
+                failed=1
+              fi
+            else
+              path="_site${thumb}"
+              echo "Checking local: $path"
+              if [ ! -f "$path" ]; then
+                echo "FAIL: not found in _site — $path"
+                failed=1
+              fi
+            fi
+          done
+          exit $failed

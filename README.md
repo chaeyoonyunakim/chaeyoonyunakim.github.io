@@ -51,13 +51,14 @@ context: "Hackathon · NHS"   # shown after period with · separator
 github: "https://github.com/chaeyoonyunakim/your-repo"
 badge: "In Progress"         # optional pill label (e.g. "1st Place", "In Progress")
 featured: true               # optional — spans full grid width, shows thumbnail
-thumb: "/assets/img/your-thumbnail.jpg"  # optional, requires featured: true
+thumb: "/assets/img/your-thumbnail.jpg"  # local path or absolute https:// URL
 thumb_alt: "Alt text for thumbnail"      # optional
 excerpt: "One-paragraph description shown on the card."
 order: 6                     # controls display order (lower = first)
 ---
 ```
 
-Note: use `period` not `date` — Jekyll tries to parse `date` as a Ruby date object.
-
-For a featured card with a thumbnail, also add the JPEG to `assets/img/`.
+**Notes:**
+- Use `period` not `date` — Jekyll tries to parse `date` as a Ruby date object.
+- `thumb` accepts either a local path (e.g. `/assets/img/foo.jpg`) or an absolute URL. For local files, add the image to `assets/img/`. For external images, pin to a specific commit SHA for a stable reference.
+- CI validates every `thumb` value on each PR: external URLs are checked with `curl --location`, local paths are checked against the built `_site/`.
