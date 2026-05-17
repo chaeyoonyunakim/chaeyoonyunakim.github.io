@@ -1,6 +1,6 @@
 ---
 title: "PWR Workforce Elasticity Modelling"
-date: "2025–2026"
+period: "2025–2026"
 context: "NHS England · Workforce Analytics"
 github: "https://github.com/chaeyoonyunakim/pwr-workforce-elasticity-modelling"
 badge: "In Progress"

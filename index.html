@@ -62,7 +62,7 @@ title: Home
       {% endif %}
       <div class="project-card-body">
         {% if project.badge %}<span class="project-badge">{{ project.badge }}</span>{% endif %}
-        <span class="post-meta">{{ project.date }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
+        <span class="post-meta">{{ project.period }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
         <span class="post-card-title">{{ project.title }}</span>
         <span class="post-excerpt">{{ project.excerpt }}</span>
         <span class="post-arrow" style="margin-top:auto;">↗</span>
@@ -74,7 +74,7 @@ title: Home
        target="_blank">
       <div class="project-card-body">
         {% if project.badge %}<span class="project-badge">{{ project.badge }}</span>{% endif %}
-        <span class="post-meta">{{ project.date }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
+        <span class="post-meta">{{ project.period }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
         <span class="post-card-title">{{ project.title }}</span>
         <span class="post-excerpt">{{ project.excerpt }}</span>
         <span class="post-arrow">↗</span>

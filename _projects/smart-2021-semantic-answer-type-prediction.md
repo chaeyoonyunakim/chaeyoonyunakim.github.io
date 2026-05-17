@@ -1,6 +1,6 @@
 ---
 title: "Semantic Answer Type Prediction"
-date: "Oct 2021"
+period: "Oct 2021"
 context: "ISWC · SMART Challenge"
 github: "https://github.com/chaeyoonyunakim/smart-2021-at-answer-type-prediction"
 badge: "1st Place"
