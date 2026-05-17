@@ -6,4 +6,9 @@ permalink: /:year/:month/:day/:title/
 
 plugins: [jekyll-feed]
 
+collections:
+  projects:
+    output: false
+    sort_by: order
+
 exclude: ['README.md', 'Gemfile.lock', 'Gemfile', 'Rakefile', 'vendor']

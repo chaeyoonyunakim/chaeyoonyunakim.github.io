@@ -49,74 +49,39 @@ title: Home
   <p class="section-label">02 — Projects</p>
   <h2 class="section-heading">Selected work.</h2>
   <div class="projects-grid">
-
-    <!-- Featured: SMART 2021 with poster thumbnail -->
+    {% assign sorted_projects = site.projects | sort: 'order' %}
+    {% for project in sorted_projects %}
+    {% if project.featured %}
     <a class="project-card project-card--featured"
-       href="https://github.com/chaeyoonyunakim/smart-2021-at-answer-type-prediction"
+       href="{{ project.github }}"
        target="_blank">
+      {% if project.thumb %}
       <div class="project-thumb">
-        <img src="/assets/img/poster-smart2021.jpg"
-             alt="CitySAT poster presented at SMART 2021 / ISWC"
-             loading="lazy">
+        <img src="{{ project.thumb }}" alt="{{ project.thumb_alt }}" loading="lazy">
       </div>
+      {% endif %}
       <div class="project-card-body">
-        <span class="project-badge">1st Place</span>
-        <span class="post-meta">Oct 2021 &middot; ISWC &middot; SMART Challenge</span>
-        <span class="post-card-title">Semantic Answer Type Prediction</span>
-        <span class="post-excerpt">MSc dissertation submitted to the SMART 2021 shared task at the International Semantic Web Conference. Ranked 1st for classifying the expected answer type — entity, literal, or boolean — from natural-language questions over a knowledge graph.</span>
+        {% if project.badge %}<span class="project-badge">{{ project.badge }}</span>{% endif %}
+        <span class="post-meta">{{ project.date }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
+        <span class="post-card-title">{{ project.title }}</span>
+        <span class="post-excerpt">{{ project.excerpt }}</span>
         <span class="post-arrow" style="margin-top:auto;">↗</span>
       </div>
     </a>
-
-    <!-- NHS Policy Navigator -->
+    {% else %}
     <a class="project-card"
-       href="https://github.com/chaeyoonyunakim/nhs-policy-navigator"
+       href="{{ project.github }}"
        target="_blank">
       <div class="project-card-body">
-        <span class="post-meta">May 2025 &middot; MongoDB Agentic Evolution Hackathon</span>
-        <span class="post-card-title">NHS Policy Navigator</span>
-        <span class="post-excerpt">Adaptive retrieval agent over the NHS 10-Year Health Plan, built in London. Uses agentic RAG to answer nuanced policy questions with source attribution.</span>
+        {% if project.badge %}<span class="project-badge">{{ project.badge }}</span>{% endif %}
+        <span class="post-meta">{{ project.date }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
+        <span class="post-card-title">{{ project.title }}</span>
+        <span class="post-excerpt">{{ project.excerpt }}</span>
         <span class="post-arrow">↗</span>
       </div>
     </a>
-
-    <!-- Reduce Non-Attended Appointments -->
-    <a class="project-card"
-       href="https://github.com/chaeyoonyunakim/hack-the-state-reduce-non-attended-hospital-appointments"
-       target="_blank">
-      <div class="project-card-body">
-        <span class="post-meta">2024 &middot; No. 10 Downing Street Hackathon</span>
-        <span class="post-card-title">Reducing Missed NHS Appointments</span>
-        <span class="post-excerpt">ML solution to cut the cost and waitlist impact of non-attended hospital appointments, developed for a hackathon challenge set by the No. 10 data science team.</span>
-        <span class="post-arrow">↗</span>
-      </div>
-    </a>
-
-    <!-- Heartlink Kiro NHS -->
-    <a class="project-card"
-       href="https://github.com/chaeyoonyunakim/heartlink-kiro-nhs"
-       target="_blank">
-      <div class="project-card-body">
-        <span class="post-meta">2025 &middot; Spec-driven ML</span>
-        <span class="post-card-title">Heartlink — Heart Disease Prediction</span>
-        <span class="post-excerpt">Spec-driven heart disease prediction pipeline with an NHS-styled dashboard. Classification, regression, and clustering on UCI Heart Disease data with clinical guardrails and property-based testing.</span>
-        <span class="post-arrow">↗</span>
-      </div>
-    </a>
-
-    <!-- PWR Workforce Elasticity Modelling -->
-    <a class="project-card"
-       href="https://github.com/chaeyoonyunakim/pwr-workforce-elasticity-modelling"
-       target="_blank">
-      <div class="project-card-body">
-        <span class="project-badge">In Progress</span>
-        <span class="post-meta">2025–2026 &middot; NHS England &middot; Workforce Analytics</span>
-        <span class="post-card-title">PWR Workforce Elasticity Modelling</span>
-        <span class="post-excerpt">Panel econometrics estimating how NHS provider non-substantive staff spend responds to agency-restriction policy. 68 NHS trusts, 4 financial years, 68 passing tests. Headline elasticity &beta; = &minus;0.287 [95% CI &minus;0.434, &minus;0.140], cluster-robust SE on ICS.</span>
-        <span class="post-arrow">↗</span>
-      </div>
-    </a>
-
+    {% endif %}
+    {% endfor %}
   </div>
 </section>
 
