@@ -9,8 +9,8 @@ Built with Jekyll. Custom layout, no external theme dependencies.
 ```
 _layouts/
   default.html   # site shell, all CSS, nav, footer
-  post.html      # writing page: renders full content or redirects to LinkedIn
-_posts/          # all writing entries (Markdown)
+  post.html      # writing page: renders full content or redirects to an external URL
+_posts/          # all writing entries (Markdown) — both on-site posts and redirect stubs
 _projects/       # project cards (Markdown front matter only, output: false)
 assets/
   img/           # static images (e.g. project poster thumbnails)
@@ -28,13 +28,13 @@ Gemfile          # Jekyll 4.3 + jekyll-feed, used by CI
 | `/cv` | `cv.html` | Full CV — experience, education, community |
 | `/:year/:month/:day/:title/` | `_posts/*.md` | Individual writing entries |
 
-## Writing: two types of post
+## Writing
 
-The writing section has two sub-groups, controlled by the `type` front matter field.
+Everything goes in `_posts/` as `YYYY-MM-DD-your-title.md`. The `type` field controls which sub-group the card appears in on the homepage, and whether the page renders on-site or redirects.
 
-### Reflections & project notes (`type: reflection`)
+### Option A — Write your own post on-site (`type: reflection`)
 
-Full on-site Markdown content — thoughts, lessons learnt, or write-ups in the style of NHS England’s [our_work](https://github.com/nhsengland/datascience/tree/main/docs/our_work) pages.
+Full Markdown content rendered on the site. Appears under **Reflections & project notes** on the homepage. Inspired by the [NHS England our_work](https://github.com/nhsengland/datascience/tree/main/docs/our_work) format.
 
 ```yaml
 ---
@@ -55,21 +55,24 @@ tags: [econometrics, NHS, panel-data]
 ## Outputs
 ```
 
-### LinkedIn articles (`type: linkedin`)
+- `summary` — shown as the card excerpt on the homepage (optional; falls back to post excerpt)
+- `tags` — displayed as pills on the card and the post page (optional)
 
-Redirects to an article published on LinkedIn Pulse.
+### Option B — Redirect to a LinkedIn article (`type: linkedin`)
+
+A lightweight stub that immediately redirects to an external URL. Appears under **On LinkedIn** on the homepage.
 
 ```yaml
 ---
 layout: post
 type: linkedin
-title: "Your article title"
-date: 2026-01-01
+title: "Accuracy matters, but usefulness matters more."
+date: 2026-04-28
 redirect_to: https://www.linkedin.com/pulse/...
 ---
 ```
 
-Any post without a `type` field will appear in the LinkedIn sub-group by default.
+Any post without a `type` field defaults to the LinkedIn sub-group.
 
 ## Adding a project card
 
