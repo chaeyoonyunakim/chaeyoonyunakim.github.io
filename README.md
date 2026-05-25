@@ -1,8 +1,8 @@
-# chaeyoonyunakim.github.io
+# Data, ethics, and lessons learned
 
 Chaeyoon Kim — Data Scientist based in London.
 
-Built with Jekyll. Custom layout, no external theme dependencies.
+Jekyll site and writing blog covering data science practice, AI ethics, and lessons from real-world health-data projects.
 
 ## Structure
 
