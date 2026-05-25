@@ -9,12 +9,20 @@ layout: default
   <p class="section-label"><a href="/#writing" style="color:inherit;text-decoration:none;">← Writing</a></p>
   <h1 class="post-page-title">{{ page.title }}</h1>
   <p class="post-page-meta">{{ page.date | date: "%B %d, %Y" }}</p>
+  {% if page.tags and page.tags.size > 0 %}
+  <div class="post-tags" style="margin-bottom: 1.5rem;">
+    {% for tag in page.tags %}<span class="post-tag">{{ tag }}</span>{% endfor %}
+  </div>
+  {% endif %}
   {% if page.redirect_to %}
   <div class="redirect-card">
     <p class="body-text">This article is published on LinkedIn Pulse.</p>
     <a class="btn btn-primary" href="{{ page.redirect_to }}" target="_blank">Read on LinkedIn ↗</a>
   </div>
   {% else %}
+  {% if page.summary %}
+  <p class="body-text" style="margin-bottom: 2rem; font-style: italic;">{{ page.summary }}</p>
+  {% endif %}
   <div class="post-body">{{ content }}</div>
   {% endif %}
 </div>

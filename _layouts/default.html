@@ -315,7 +315,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1rem;
-      margin-top: 2.5rem;
+      margin-top: 1.5rem;
     }
 
     .post-card {
@@ -356,6 +356,37 @@
       margin-top: auto;
       font-size: 1rem;
       color: var(--accent);
+    }
+
+    /* Writing sub-labels */
+    .writing-sub-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 3rem;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Post tags */
+    .post-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.25rem;
+    }
+    .post-tag {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.2rem 0.5rem;
     }
 
     /* BUTTONS */
@@ -408,7 +439,7 @@
       font-weight: 500;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      margin-bottom: 2.5rem;
+      margin-bottom: 1.25rem;
     }
     .redirect-card {
       background: var(--card-bg);
@@ -426,6 +457,17 @@
     }
     .post-body p { margin-bottom: 1.25rem; }
     .post-body h2 { font-size: 1.4rem; font-weight: 700; margin: 2rem 0 0.75rem; }
+    .post-body h3 { font-size: 1.15rem; font-weight: 700; margin: 1.5rem 0 0.5rem; }
+    .post-body ul, .post-body ol { margin: 0 0 1.25rem 1.5rem; }
+    .post-body li { margin-bottom: 0.4rem; }
+    .post-body a { color: var(--accent); text-decoration: underline; }
+    .post-body code { font-family: monospace; font-size: 0.9em; background: var(--border); padding: 0.1em 0.35em; border-radius: 3px; }
+    .post-body pre { background: var(--border); padding: 1rem; border-radius: 4px; overflow-x: auto; margin-bottom: 1.25rem; }
+    .post-body pre code { background: none; padding: 0; }
+    .post-body blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .post-body table { width: 100%; border-collapse: collapse; margin-bottom: 1.25rem; font-size: 0.9rem; }
+    .post-body th, .post-body td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
+    .post-body th { font-weight: 600; background: var(--card-bg); }
 
     /* FOOTER */
     footer {

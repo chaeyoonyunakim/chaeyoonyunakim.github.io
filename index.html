@@ -10,17 +10,7 @@ title: Home
   </p>
   <div class="btn-group">
     <a href="https://www.linkedin.com/in/chaeyoonyunakim" class="btn btn-primary" target="_blank">LinkedIn ↗</a>
-    <a href="mailto:chaeyoonyunakim@gmail.com" class="btn btn-outline">Email ✉</a>
-  </div>
-  <p class="meta-label" style="margin-top:2rem;">Top skills</p>
-  <div class="cv-tags" style="margin-top:0.5rem;">
-    <span class="cv-tag">Python</span>
-    <span class="cv-tag">PySpark</span>
-    <span class="cv-tag">Machine Learning</span>
-    <span class="cv-tag">AI Engineering</span>
-    <span class="cv-tag">Tableau</span>
-    <span class="cv-tag">SQL</span>
-    <span class="cv-tag">R</span>
+    <a href="/cv" class="btn btn-outline">View CV</a>
   </div>
 </section>
 
@@ -98,8 +88,31 @@ title: Home
 <section class="section" id="writing">
   <p class="section-label">03 — Writing</p>
   <h2 class="section-heading">Thoughts on<br>data science.</h2>
+
+  {% assign reflections = site.posts | where: "type", "reflection" %}
+  {% if reflections.size > 0 %}
+  <p class="writing-sub-label">Reflections &amp; project notes</p>
   <div class="posts-grid">
-    {% for post in site.posts %}
+    {% for post in reflections %}
+    <a class="post-card" href="{{ post.url }}">
+      <span class="post-meta">{{ post.date | date: "%b %d, %Y" }}</span>
+      <span class="post-card-title">{{ post.title }}</span>
+      {% if post.summary %}<span class="post-excerpt">{{ post.summary }}</span>
+      {% elsif post.excerpt %}<span class="post-excerpt">{{ post.excerpt | strip_html | truncate: 110 }}</span>{% endif %}
+      {% if post.tags and post.tags.size > 0 %}
+      <div class="post-tags">{% for tag in post.tags %}<span class="post-tag">{{ tag }}</span>{% endfor %}</div>
+      {% endif %}
+      <span class="post-arrow">↗</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% assign external_posts = site.posts | where_exp: "post", "post.type != 'reflection'" %}
+  {% if external_posts.size > 0 %}
+  <p class="writing-sub-label">On LinkedIn</p>
+  <div class="posts-grid">
+    {% for post in external_posts %}
     <a class="post-card" href="{{ post.url }}">
       <span class="post-meta">{{ post.date | date: "%b %d, %Y" }}</span>
       <span class="post-card-title">{{ post.title }}</span>
@@ -108,4 +121,5 @@ title: Home
     </a>
     {% endfor %}
   </div>
+  {% endif %}
 </section>
