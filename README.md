@@ -97,3 +97,11 @@ order: 6                     # controls display order (lower = first)
 - Use `period` not `date` — Jekyll tries to parse `date` as a Ruby date object.
 - `thumb` accepts a local path or an absolute URL. Pin external images to a commit SHA for stability.
 - CI validates every `thumb` value on each PR: external URLs via `curl --location`, local paths against built `_site/`.
+
+## License
+
+Code in this repository is released under the [MIT License](LICENSE).
+
+All written content — blog posts, CV, project descriptions, and other prose —
+is © 2026 Chaeyoon Kim, all rights reserved, and is not covered by the MIT
+license.
