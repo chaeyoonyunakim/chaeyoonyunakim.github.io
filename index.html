@@ -62,6 +62,24 @@ title: Home
     {% assign sorted_projects = site.projects | sort: 'order' %}
     {% for project in sorted_projects %}
     {% if project.featured %}
+    {% if project.links %}
+    <div class="project-card project-card--featured project-card--linked">
+      {% if project.thumb %}
+      <div class="project-thumb">
+        <img src="{{ project.thumb }}" alt="{{ project.thumb_alt }}" loading="lazy">
+      </div>
+      {% endif %}
+      <div class="project-card-body">
+        {% if project.badge %}<span class="project-badge">{{ project.badge }}</span>{% endif %}
+        <span class="post-meta">{{ project.period }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
+        <a class="post-card-title project-card-stretch" href="{{ project.github }}" target="_blank">{{ project.title }}</a>
+        <span class="post-excerpt">{{ project.excerpt }}</span>
+        <div class="project-links">
+          {% for link in project.links %}<a class="project-link" href="{{ link.url }}" target="_blank">{{ link.label }} ↗</a>{% endfor %}
+        </div>
+      </div>
+    </div>
+    {% else %}
     <a class="project-card project-card--featured"
        href="{{ project.github }}"
        target="_blank">
@@ -78,6 +96,7 @@ title: Home
         <span class="post-arrow" style="margin-top:auto;">↗</span>
       </div>
     </a>
+    {% endif %}
     {% else %}
     <a class="project-card"
        href="{{ project.github }}"

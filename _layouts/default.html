@@ -309,6 +309,40 @@
       align-self: flex-start;
       margin-bottom: 0.25rem;
     }
+    /* Card with secondary links: whole card links to the primary repo via a
+       stretched title link, while the pill links below stay independently clickable. */
+    .project-card--linked { position: relative; }
+    .project-card-stretch {
+      color: var(--text);
+      text-decoration: none;
+    }
+    .project-card-stretch::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    .project-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: auto;
+      position: relative;
+      z-index: 2;
+    }
+    .project-link {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.3rem 0.7rem;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .project-link:hover { border-color: var(--accent); }
 
     /* POSTS GRID */
     .posts-grid {
