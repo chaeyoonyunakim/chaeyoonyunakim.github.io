@@ -70,7 +70,7 @@ title: Home
       </div>
       {% endif %}
       <div class="project-card-body">
-        {% if project.badge %}<span class="project-badge">{{ project.badge }}</span>{% endif %}
+        {% if project.badge %}<span class="project-badge{% if project.badge == 'In Progress' %} project-badge--progress{% endif %}">{{ project.badge }}</span>{% endif %}
         <span class="post-meta">{{ project.period }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
         <a class="post-card-title project-card-stretch" href="{{ project.github }}" target="_blank">{{ project.title }}</a>
         <span class="post-excerpt">{{ project.excerpt }}</span>
@@ -89,7 +89,7 @@ title: Home
       </div>
       {% endif %}
       <div class="project-card-body">
-        {% if project.badge %}<span class="project-badge">{{ project.badge }}</span>{% endif %}
+        {% if project.badge %}<span class="project-badge{% if project.badge == 'In Progress' %} project-badge--progress{% endif %}">{{ project.badge }}</span>{% endif %}
         <span class="post-meta">{{ project.period }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
         <span class="post-card-title">{{ project.title }}</span>
         <span class="post-excerpt">{{ project.excerpt }}</span>
@@ -102,7 +102,7 @@ title: Home
        href="{{ project.github }}"
        target="_blank">
       <div class="project-card-body">
-        {% if project.badge %}<span class="project-badge">{{ project.badge }}</span>{% endif %}
+        {% if project.badge %}<span class="project-badge{% if project.badge == 'In Progress' %} project-badge--progress{% endif %}">{{ project.badge }}</span>{% endif %}
         <span class="post-meta">{{ project.period }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
         <span class="post-card-title">{{ project.title }}</span>
         <span class="post-excerpt">{{ project.excerpt }}</span>

@@ -16,6 +16,7 @@
       --text: #111111;
       --muted: #777777;
       --accent: #c9856a;
+      --accent-green: #4f8a5b;
       --border: #e4d8d2;
       --card-bg: #ffffff;
       --max-w: 860px;
@@ -309,6 +310,8 @@
       align-self: flex-start;
       margin-bottom: 0.25rem;
     }
+    /* "In Progress" badges use green; other badges (e.g. "1st Place") keep the accent. */
+    .project-badge--progress { background: var(--accent-green); }
     /* Card with secondary links: whole card links to the primary repo via a
        stretched title link, while the pill links below stay independently clickable. */
     .project-card--linked { position: relative; }
