@@ -58,60 +58,26 @@ title: Home
 <section class="section" id="projects">
   <p class="section-label">02 — Projects</p>
   <h2 class="section-heading">Selected work.</h2>
-  <div class="projects-grid">
-    {% assign sorted_projects = site.projects | sort: 'order' %}
-    {% for project in sorted_projects %}
-    {% if project.featured %}
-    {% if project.links %}
-    <div class="project-card project-card--featured project-card--linked">
-      {% if project.thumb %}
-      <div class="project-thumb">
-        <img src="{{ project.thumb }}" alt="{{ project.thumb_alt }}" loading="lazy">
-      </div>
-      {% endif %}
-      <div class="project-card-body">
-        {% if project.badge %}<span class="project-badge{% if project.badge == 'In Progress' %} project-badge--progress{% endif %}">{{ project.badge }}</span>{% endif %}
-        <span class="post-meta">{{ project.period }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
-        <a class="post-card-title project-card-stretch" href="{{ project.github }}" target="_blank">{{ project.title }}</a>
-        <span class="post-excerpt">{{ project.excerpt }}</span>
-        <div class="project-links">
-          {% for link in project.links %}<a class="project-link" href="{{ link.url }}" target="_blank">{{ link.label }} ↗</a>{% endfor %}
-        </div>
-      </div>
+  <div class="projects-columns">
+    <div class="projects-col">
+      <p class="writing-sub-label projects-col-label">NLP, Text &amp; QA</p>
+      {% assign left_projects = site.projects | where: "group", "left" | sort: "order" %}
+      {% for project in left_projects %}{% include project-card.html project=project %}{% endfor %}
     </div>
-    {% else %}
-    <a class="project-card project-card--featured"
-       href="{{ project.github }}"
-       target="_blank">
-      {% if project.thumb %}
-      <div class="project-thumb">
-        <img src="{{ project.thumb }}" alt="{{ project.thumb_alt }}" loading="lazy">
-      </div>
-      {% endif %}
-      <div class="project-card-body">
-        {% if project.badge %}<span class="project-badge{% if project.badge == 'In Progress' %} project-badge--progress{% endif %}">{{ project.badge }}</span>{% endif %}
-        <span class="post-meta">{{ project.period }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
-        <span class="post-card-title">{{ project.title }}</span>
-        <span class="post-excerpt">{{ project.excerpt }}</span>
-        <span class="post-arrow" style="margin-top:auto;">↗</span>
-      </div>
-    </a>
-    {% endif %}
-    {% else %}
-    <a class="project-card"
-       href="{{ project.github }}"
-       target="_blank">
-      <div class="project-card-body">
-        {% if project.badge %}<span class="project-badge{% if project.badge == 'In Progress' %} project-badge--progress{% endif %}">{{ project.badge }}</span>{% endif %}
-        <span class="post-meta">{{ project.period }}{% if project.context %} &middot; {{ project.context }}{% endif %}</span>
-        <span class="post-card-title">{{ project.title }}</span>
-        <span class="post-excerpt">{{ project.excerpt }}</span>
-        <span class="post-arrow">↗</span>
-      </div>
-    </a>
-    {% endif %}
-    {% endfor %}
+    <div class="projects-col">
+      <p class="writing-sub-label projects-col-label">AI Engineering &amp; ML</p>
+      {% assign right_projects = site.projects | where: "group", "right" | sort: "order" %}
+      {% for project in right_projects %}{% include project-card.html project=project %}{% endfor %}
+    </div>
   </div>
+
+  {% assign more_projects = site.projects | where: "group", "more" | sort: "order" %}
+  {% if more_projects.size > 0 %}
+  <p class="writing-sub-label">More projects</p>
+  <div class="projects-grid">
+    {% for project in more_projects %}{% include project-card.html project=project compact=true %}{% endfor %}
+  </div>
+  {% endif %}
 </section>
 
 <section class="section" id="writing">

@@ -11,5 +11,6 @@ excerpt: "My seed idea for a bilingual Korean/English Kanban: a child's typed, s
 links:
   - label: "Live app"
     url: "https://togethertodo.lovable.app/"
-order: 8
+group: more
+order: 1
 ---
