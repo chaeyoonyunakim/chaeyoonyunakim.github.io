@@ -1,5 +1,6 @@
 ---
 layout: post
+type: reflection
 title: "Fixing a Sentiment Analysis Pipeline: A Checklist for Next Time"
 date: 2026-07-01
 categories: [nlp, data-analysis, postmortem]

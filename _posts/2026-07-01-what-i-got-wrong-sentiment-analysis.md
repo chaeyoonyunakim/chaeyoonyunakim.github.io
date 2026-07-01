@@ -1,5 +1,6 @@
 ---
 layout: post
+type: reflection
 title: "What I Got Wrong Building a Sentiment Analysis Pipeline for Survey Data"
 date: 2026-07-01
 categories: [nlp, data-analysis, postmortem]
