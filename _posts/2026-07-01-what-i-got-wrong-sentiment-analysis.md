@@ -68,3 +68,5 @@ More importantly: I never validated the model's output against a hand-labeled sa
 ## The general lesson
 
 Every one of these bugs was invisible from the summary statistics alone — the numbers looked plausible (small, near-zero, "neutral"), just wrong. The only way I caught them was by tracing a few individual responses through every transformation step and checking the *intermediate* output, not just the final score. If a sentiment pipeline on emotionally loaded text comes back suspiciously flat, that's a signal to go inspect the preprocessing, not to conclude the respondents didn't feel anything.
+
+For the concrete fixes I'm carrying into the next pipeline — code snippets included — see the follow-up post: [Fixing a Sentiment Analysis Pipeline: A Checklist for Next Time]({% post_url 2026-07-01-fixing-sentiment-analysis-pipeline-next-time %}).
