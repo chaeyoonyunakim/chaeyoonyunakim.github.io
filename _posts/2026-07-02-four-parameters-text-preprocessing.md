@@ -63,6 +63,8 @@ All four parameters exist to answer the same question differently: which word va
 
 ### A. The `TextPreprocessor` class
 
+*Custom project code — no official docs; it's built on the libraries referenced in B–F below.*
+
 ```python
 class TextPreprocessor:
     """
@@ -128,12 +130,16 @@ class TextPreprocessor:
 
 ### B. Contraction expansion
 
+*Docs: [`contractions` on GitHub](https://github.com/kootenpv/contractions) — no separate docs site; the README is the reference.*
+
 ```python
 contractions.fix("Leadership didn't communicate well")
 # -> "Leadership did not communicate well"
 ```
 
 ### C. Stopword additions and the negation carve-out
+
+*Docs: [NLTK Stopwords Corpus](https://www.nltk.org/nltk_data/)*
 
 ```python
 self.stopwords.extend(['would', 'wte', 'slt', 'senior', 'leader',
@@ -146,6 +152,8 @@ self.stopwords = [w for w in self.stopwords if w not in negations]
 
 ### D. Stemming examples
 
+*Docs: [`nltk.stem.porter` — PorterStemmer](https://www.nltk.org/api/nltk.stem.porter.html)*
+
 ```python
 ps.stem("communication")  # -> "commun"
 ps.stem("leadership")     # -> "leadership"  (already in the extended stopword list, so moot here)
@@ -155,6 +163,8 @@ ps.stem("supportive")     # -> "support"
 
 ### E. Lemmatization three-pass
 
+*Docs: [`nltk.stem.wordnet` — WordNetLemmatizer](https://www.nltk.org/api/nltk.stem.wordnet.html)*
+
 ```python
 words = [wordnet_lemmatizer.lemmatize(w, pos="n") for w in words]  # nouns:  "leaders" -> "leader"
 words = [wordnet_lemmatizer.lemmatize(w, pos="v") for w in words]  # verbs:  "communicated" -> "communicate"
@@ -162,6 +172,8 @@ words = [wordnet_lemmatizer.lemmatize(w, pos="a") for w in words]  # adjectives:
 ```
 
 ### F. Polarity scoring
+
+*Docs: [TextBlob Quickstart — Sentiment Analysis](https://textblob.readthedocs.io/en/latest/quickstart.html#sentiment-analysis)*
 
 ```python
 preprocessor = TextPreprocessor(contractions=True, rm_stopwords=True, stemming=False, lemmatization=False)
