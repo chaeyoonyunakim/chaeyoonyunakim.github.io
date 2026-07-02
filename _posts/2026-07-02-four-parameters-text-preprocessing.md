@@ -15,6 +15,7 @@ class TextPreprocessor:
     Process text in columns of a DataFrame.
 
     Args:
+        contractions: Set True to expand contractions in normalization.
         rm_stopwords: Set True to apply stopwords in normalization.
         stemming: Set True to apply ps in normalization.
         lemmatization: Set True to apply wordnet_lemmatizer in normalization.
@@ -28,7 +29,7 @@ class TextPreprocessor:
         process_text(df, columns): Normalizes text columns in a DataFrame.
     """
 
-    def __init__(self, rm_stopwords, stemming, lemmatization):
+    def __init__(self, contractions, rm_stopwords, stemming, lemmatization):
         self.stopwords = stopwords.words('english')
         self.stopwords.extend(['would', 'wte', 'slt', 'senior', 'leader',
                                 'leadership', 'sub', 'team', 'member', 'feel',
@@ -40,13 +41,15 @@ class TextPreprocessor:
         self.ps = PorterStemmer()
         self.wordnet_lemmatizer = WordNetLemmatizer()
 
+        self.contractions = contractions
         self.rm_stopwords = rm_stopwords
         self.stemming = stemming
         self.lemmatization = lemmatization
 
     def process_text(self, df, columns):
         def normalise_text(sent):
-            sent = contractions.fix(sent)
+            if self.contractions:
+                sent = contractions.fix(sent)
             words = word_tokenize(sent)
             words = [w.lower() for w in words if w.isalpha()]
 
@@ -69,18 +72,18 @@ class TextPreprocessor:
         return df
 ```
 
-Four things happen to a raw survey response before it becomes a token in a word cloud: contraction expansion, stopword removal, stemming, and lemmatization. `rm_stopwords`, `stemming`, and `lemmatization` are independent booleans, which makes it easy to turn any of them on or off — but "independent" also means it's on you to know what combining them does. Here's each one.
+Four things happen to a raw survey response before it becomes a token in a word cloud: contraction expansion, stopword removal, stemming, and lemmatization. `contractions`, `rm_stopwords`, `stemming`, and `lemmatization` are all independent booleans, which makes it easy to turn any of them on or off — but "independent" also means it's on you to know what combining them does. Here's each one.
 
 ## 1. Contractions — expanded before tokenizing, not after
 
-`contractions.fix(sent)` runs first, on the raw sentence string, before `word_tokenize` ever sees it:
+When `self.contractions` is true, `contractions.fix(sent)` runs first, on the raw sentence string, before `word_tokenize` ever sees it:
 
 ```python
 contractions.fix("Leadership didn't communicate well")
 # -> "Leadership did not communicate well"
 ```
 
-Order matters here specifically because of how NLTK's tokenizer handles contractions. `word_tokenize("didn't")` splits into `["did", "n't"]`, and `"n't"` then fails the `w.isalpha()` filter two lines later — so if contractions aren't expanded first, the negation particle is silently dropped before the stopword list is even consulted. Expanding contractions on the full string first turns `"didn't"` into two ordinary words, `"did"` and `"not"`, both of which survive tokenization intact.
+Order matters here specifically because of how NLTK's tokenizer handles contractions. `word_tokenize("didn't")` splits into `["did", "n't"]`, and `"n't"` then fails the `w.isalpha()` filter two lines later — so if contractions aren't expanded first, the negation particle is silently dropped before the stopword list is even consulted. Expanding contractions on the full string first turns `"didn't"` into two ordinary words, `"did"` and `"not"`, both of which survive tokenization intact. Note the naming: the `contractions` parameter (a bool) and the `contractions` module (imported at the top) share a name, but Python resolves them separately — the parameter is a local name in `__init__`'s scope, while the module reference inside `normalise_text` resolves normally through the enclosing module scope, so `contractions.fix(sent)` still calls the library function correctly.
 
 ## 2. Stopwords — what's added, and what's deliberately kept
 
@@ -139,13 +142,13 @@ sentiment_scores = df_norm.map(get_sentiment)
 The `df_norm` feeding `get_sentiment` here isn't built with the same flags I'd use for a word cloud. It comes from the same `TextPreprocessor` class, but instantiated as:
 
 ```python
-preprocessor = TextPreprocessor(rm_stopwords=True, stemming=False, lemmatization=False)
+preprocessor = TextPreprocessor(contractions=True, rm_stopwords=True, stemming=False, lemmatization=False)
 df_norm = preprocessor.process_text(df, columns)
 ```
 
 In terms of the four knobs above, that's **(1) contractions = True, (2) stopwords = True, (3) stemming = False, (4) lemmatization = False.** Here's why each one has to land exactly there for polarity scoring to work:
 
-**(1) Contractions: True — there's no other option.** Contraction expansion isn't actually gated behind a flag in this class; `contractions.fix()` always runs. That happens to be exactly right for polarity scoring too — `TextBlob("not happy")` and `TextBlob("happy")` score oppositely, so the negation particle has to survive as a real token, not get lost as an orphaned `"n't"`.
+**(1) Contractions: True — this one's non-negotiable.** `TextBlob("not happy")` and `TextBlob("happy")` score oppositely, so the negation particle has to survive as a real token. Leaving `contractions` off would mean `word_tokenize("didn't")` splits into `["did", "n't"]`, `"n't"` fails the alphabetic filter, and the negation disappears before it ever reaches TextBlob — silently turning a negative response into a positive-scoring one. `contractions=True` is what expands it to `"did"` + `"not"` first, so both survive.
 
 **(2) Stopwords: True — safe, because the list only removes words TextBlob was never going to score.** `pattern.en` scores by matching individual words — mostly adjectives — against a fixed lexicon. Removing "the", "is", "would", "team", "leadership", and the rest of the extended stopword list doesn't touch anything TextBlob would have picked up, because none of those words are in its adjective dictionary to begin with. And because negation words were already carved back out of `self.stopwords` in `__init__`, turning `rm_stopwords` on here strips noise for free without risking a flipped polarity.
 
