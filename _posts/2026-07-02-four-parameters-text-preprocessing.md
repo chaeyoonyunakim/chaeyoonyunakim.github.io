@@ -7,7 +7,7 @@ categories: [nlp, data-analysis]
 tags: [python, nltk, text-preprocessing, contractions, stopwords, stemming, lemmatization]
 ---
 
-In [What I Got Wrong Building a Sentiment Analysis Pipeline for Survey Data]({% post_url 2026-07-01-what-i-got-wrong-sentiment-analysis %}) and the [follow-up checklist]({% post_url 2026-07-01-fixing-sentiment-analysis-pipeline-next-time %}), I wrote about the bugs that came from treating "normalize text" as a single, undifferentiated step. This post is the reference I wish I'd had at the time: a walkthrough of the `TextPreprocessor` class that produces the bag-of-words / word-cloud input for that survey pipeline, and the four parameters that control what happens to each response before it's counted.
+In [What I Got Wrong Building a Sentiment Analysis Pipeline for Survey Data]({% post_url 2026-07-01-what-i-got-wrong-sentiment-analysis %}) and the [follow-up checklist]({% post_url 2026-07-01-fixing-sentiment-analysis-pipeline-next-time %}), I wrote about the bugs that came from treating "normalize text" as a single, undifferentiated step. This post is the reference I wish I'd had at the time: a walkthrough of the `TextPreprocessor` class behind that pipeline, the four parameters that control what happens to each response before it's counted, and — at the end — why the sentiment-scoring step needs a different combination of those same four parameters than the word cloud does.
 
 ```python
 class TextPreprocessor:
@@ -126,10 +126,39 @@ words = [wordnet_lemmatizer.lemmatize(w, pos="a") for w in words]  # adjectives:
 
 Each pass is a no-op for words that don't match that part of speech, so running all three in sequence is a cheap way to catch noun, verb, and adjective inflections without a separate POS tagger — at the cost of being approximate (a word that's actually a noun still gets passed through the verb and adjective lemmatizers, which usually leaves it unchanged, but isn't guaranteed to for every edge case).
 
+## 5. Polarity scoring — the one configuration that doesn't erase the signal
+
+```python
+def get_sentiment(text):
+    blob = TextBlob(text)
+    return blob.sentiment.polarity
+
+sentiment_scores = df_norm.map(get_sentiment)
+```
+
+The `df_norm` feeding `get_sentiment` here isn't built with the same flags I'd use for a word cloud. It comes from the same `TextPreprocessor` class, but instantiated as:
+
+```python
+preprocessor = TextPreprocessor(rm_stopwords=True, stemming=False, lemmatization=False)
+df_norm = preprocessor.process_text(df, columns)
+```
+
+In terms of the four knobs above, that's **(1) contractions = True, (2) stopwords = True, (3) stemming = False, (4) lemmatization = False.** Here's why each one has to land exactly there for polarity scoring to work:
+
+**(1) Contractions: True — there's no other option.** Contraction expansion isn't actually gated behind a flag in this class; `contractions.fix()` always runs. That happens to be exactly right for polarity scoring too — `TextBlob("not happy")` and `TextBlob("happy")` score oppositely, so the negation particle has to survive as a real token, not get lost as an orphaned `"n't"`.
+
+**(2) Stopwords: True — safe, because the list only removes words TextBlob was never going to score.** `pattern.en` scores by matching individual words — mostly adjectives — against a fixed lexicon. Removing "the", "is", "would", "team", "leadership", and the rest of the extended stopword list doesn't touch anything TextBlob would have picked up, because none of those words are in its adjective dictionary to begin with. And because negation words were already carved back out of `self.stopwords` in `__init__`, turning `rm_stopwords` on here strips noise for free without risking a flipped polarity.
+
+**(3) Stemming: False — this is the one that actually matters.** This is Mistake 1 from the postmortem, restated as a parameter choice: `ps.stem("frustrating")` returns `"frustrat"`, which isn't a word TextBlob's dictionary recognizes, so `TextBlob("frustrat").sentiment.polarity` comes back `0.0` — not because the response was neutral, but because the word that would have scored it no longer exists after stemming. Turning `stemming` off is what keeps `"frustrating"`, `"unsupported"`, and `"disorganised"` intact and scoreable.
+
+**(4) Lemmatization: False — for the same reason, even though it's gentler.** Lemmatization produces real dictionary words, which makes it look safer than stemming, but it still changes the exact form of the word being checked against TextBlob's lexicon — and that lexicon is small (~2,900 hand-tagged entries), built against whatever inflected forms its authors happened to tag, not systematically against every lemma. Swapping `"worse"` for `"bad"` or `"frustrating"` for `"frustrate"` risks landing on a form that scores differently, or isn't in the dictionary at all, for no benefit — a word cloud needs canonical forms to group counts; a fixed-dictionary scorer needs the original inflection, because that's the form it was hand-labelled against.
+
+The pattern underneath all four: for a lexicon-based scorer, every transformation is a *risk of losing a dictionary match*, not a neutral cleanup step. Stopword removal is safe because it only ever removes words the lexicon wasn't going to score anyway. Stemming and lemmatization are unsafe because they change the very word the lexicon is trying to look up. `(1)=True, (2)=True, (3)=False, (4)=False` isn't an arbitrary choice — it's "keep everything TextBlob might match, strip everything it definitely won't."
+
 ## The one gotcha: don't turn on both 3 and 4 at once
 
 `stemming` and `lemmatization` are independent flags, but stacking them isn't "get the benefits of both" — Porter stemming runs first and already mangles words into non-dictionary fragments, so by the time `WordNetLemmatizer` runs, most inputs are things like `"commun"` or `"frustrat"` that aren't in WordNetLemmatizer's dictionary and pass through unchanged. In practice, pick one: stemming for a faster, coarser grouping, or lemmatization alone for output that stays human-readable in a word cloud. Running both isn't wrong, exactly — it's just paying for a step that mostly does nothing.
 
 ## The general shape
 
-All four parameters exist to answer the same question differently: which word variants should collapse into the same bucket when you're counting what people said? Contractions and negation-aware stopwords protect meaning; stemming and lemmatization control how aggressively variants get merged. The parameter that matters most isn't any one of these — it's remembering which *pipeline* this normalized output is for. Built for frequency counts, it should never be the same string handed to a sentiment scorer.
+All four parameters exist to answer the same question differently: which word variants should collapse into the same bucket when you're counting what people said? Contractions and negation-aware stopwords protect meaning; stemming and lemmatization control how aggressively variants get merged. The same class can serve both the word cloud and the sentiment scorer, but never with the same flags: `stemming`/`lemmatization` on (or either one) for frequency counts, both off for polarity scoring. The parameter that matters most isn't any single flag — it's remembering which pipeline the output is about to feed before you decide how aggressively to transform it.
