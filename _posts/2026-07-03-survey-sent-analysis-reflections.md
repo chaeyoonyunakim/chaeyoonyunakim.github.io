@@ -2,7 +2,7 @@
 layout: post
 type: reflection
 title: "Survey data analysis for free-text responses"
-date: 2026-07-02
+date: 2026-07-03
 categories: [자연어, 데이터과학]
 tags: [python, nltk, text-preprocessing, contractions, stopwords, stemming, lemmatization]
 ---
