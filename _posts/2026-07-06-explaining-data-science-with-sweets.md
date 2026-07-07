@@ -8,7 +8,7 @@ tags: [volunteering, classification, STEM-outreach, labelling, british-english]
 summary: "I volunteered at two school events to explain what a data scientist does — to Year 1 and 2 at an academy, and to Year 7–8 and Year 12–13 at a secondary school. Part of my talk was a sweet-sorting classifier, and it accidentally demonstrated why label vocabulary matters more than model choice."
 ---
 
-I recently volunteered at two school events to talk about what I do as a data scientist and what you study to become one. One invite came from an academy, where I spoke to Year 1 and 2. The other came from a secondary school, where the audiences were Year 7 and 8, and Year 12 and 13. The same job, explained to a six-year-old, a twelve-year-old, and someone choosing university courses.
+I recently volunteered at two school events to talk about what I do as a data scientist and what you study to become one. One invite came from an academy, where I spoke to Year 1 and 2. The other came from a secondary school, where the audiences were Year 7 and 8, and Year 12 and 13. The same job, explained to a six-year-old, a twelve-year-old, and someone choosing between GCSE and A level subjects.
 
 Part of my talk was a running example: sorting sweets with a classification model. It mostly worked. Where it went wrong taught me something I should have known already — and it turned out to be the best data science lesson in the room.
 
