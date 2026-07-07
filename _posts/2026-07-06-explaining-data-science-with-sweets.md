@@ -38,7 +38,7 @@ From there I aimed to extend the example with a second classifier. Instead of tw
 
 ![A collage of familiar British confectionery: Skittles, Smarties, M&M's, Maltesers, Galaxy, Dairy Milk, Aero, Haribo Goldbears, Jelly Babies, Kinder Surprise, lollipops and more](/assets/img/school-talk-sweets-collage.png)
 
-Skittles go one way, Aero goes the other, and then you hit the fun edge cases: what about chocolate-covered things? M&M's? A Kinder Surprise, which is chocolate wrapped around a toy? Suddenly we were talking about ambiguous examples, fuzzy class boundaries, and who gets to decide the ground truth — which is most of applied machine learning, delivered via a bag of Haribo.
+Skittles go one way, Aero goes the other, and then you hit the fun edge cases: what about chocolate-covered things? M&M's? A Kinder Surprise, which is chocolate wrapped around a toy? I led the class talking about ambiguous examples, fuzzy class boundaries, and who gets to decide the ground truth — which is most of applied machine learning, delivered via a bag of Haribo.
 
 With Year 12 and 13 that opened the door to the "what do I study for this" conversation: maths and statistics for the decision boundaries, computing for the pipelines, and — as I was about to inadvertently demonstrate — a lot of careful thinking about how you define your labels in the first place.
 
