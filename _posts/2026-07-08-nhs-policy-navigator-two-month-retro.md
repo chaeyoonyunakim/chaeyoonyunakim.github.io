@@ -65,6 +65,10 @@ The shape that came out of phases 2 and 3 is three layers (the full write-up is 
 
 Three Atlas collections carry the state: `nhs_chunks` (embedded plan chunks with vector and full-text indexes), `query_log` (the append-only decision trail that powers both the history tab and the strategy learning), and `query_digest` (deduplicated question clusters behind the main-page digest). Live NHS England RSS is fetched at query time, and everything — tagging, dedup routing, news and publication fetches, re-ranking — degrades gracefully: a failure never blocks an answer.
 
+**Deployment** is on **Vercel**: `vercel.json` routes `/api/*` to the FastAPI app running as a Python serverless function (`api/index.py`) and serves the front end as static files — no server to manage, and every push to `main` redeploys the live demo.
+
+**CI** lives in the repo as a GitHub Actions workflow (`.github/workflows/ci.yml`) that runs on every push and pull request: `ruff` linting, `black` formatting checks, and the pytest suite, in a matrix across Python 3.10, 3.11 and 3.12. Alongside it sit the local guardrails — a `Makefile` for the common tasks and `pre-commit` hooks that catch lint and formatting issues before they ever reach CI.
+
 ## Phase 4: the Query Router, and naming what's actually adaptive (June, v1.1.0)
 
 The headline feature — shipped as **v1.1.0** the day after v1.0.0, which tells you how much the groundwork helped — was the **Query Router**. Every query is tagged with NHS-domain facets (care setting and professional group), and near-identical questions are deduplicated into a categorised digest: the front page shows the top-10 most-asked topics per category, while a separate Previous Queries tab keeps the full append-only history. A supervising LLM produces the executive summary; live news and publication feeds fill in what happened after the plan was published.
