@@ -91,6 +91,14 @@ thing?* Two didn't:
 Both were there for hackathon sponsor-surface, not for the product. I cut them,
 collapsed the graph, and shipped **1.0.0**. The repo lost ~190 lines and got honest.
 
+If this sounds familiar, it's because it's the second time I've lived this exact
+arc: in [the NHS Policy Navigator two-month retro]({% post_url 2026-07-08-nhs-policy-navigator-two-month-retro %})
+the same post-hackathon pass stripped the over-specced sponsor engines (the voice
+agent, the AWS dependencies) and right-sized the stack to what the product actually
+needed — and there, too, the honesty audit that followed ("what here is genuinely
+adaptive?") turned out to be the most valuable artefact. Apparently this is just what
+week two after a hackathon is *for*.
+
 Then I wired **auto-deploy** to the Space — and immediately hit a great little bug:
 Hugging Face's git backend *rejects binary files committed to history*, and there was
 a stray 0.14 MB PNG buried in the initial commit. The fix taught me something clean:
