@@ -8,7 +8,7 @@ tags: [eu-ai-act, ai-ethics, nhs, RAP, formal-methods, agentic-ai, teaching, kir
 summary: "Talk abstract: an AI Engineering teaching initiative in the NHS where specification, invariants, and testing are taught through the lens of regulatory accountability — reframing formal methods from arcane overhead into necessary practice."
 ---
 
-*This is the abstract for my talk "From Guardrails to Governance: Teaching Reasoning About AI-Assisted Code in Safety-critical Contexts" (Chaeyoon Kim, NHS England).*
+*This is the abstract for my talk "From Guardrails to Governance: Teaching Reasoning About AI-Assisted Code in Safety-critical Contexts" (Chaeyoon Kim, NHS England), presented at the [18th Europe-Korea Conference on Science and Technology (EKC 2026)](https://www.ekc2026.org/page/programme/stdivision/5), 20–23 July 2026, Toulouse, France.*
 
 ## Abstract
 
