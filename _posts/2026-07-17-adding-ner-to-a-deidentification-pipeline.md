@@ -1,223 +1,190 @@
 ---
 layout: post
 type: reflection
-title: "Adding NER to a De-identification Pipeline — Without Betting the Guarantee on It"
+title: "Where Regex Ends: Practical NER for PII in Free Text"
 date: 2026-07-17
-categories: [healthcare-ai, engineering]
-tags: [nhs, de-identification, ner, presidio, spacy, nlp, healthcare-ai]
-summary: "How NoteGuard uses Presidio + spaCy (en_core_web_md), why it's an optional extra, and the gotchas nobody warns you about."
+categories: [nlp, data-science]
+tags: [ner, spacy, presidio, text-processing, pii, nlp, python]
+summary: "Running spaCy NER (via Presidio) to catch names in free text — model selection as a recall dial, the confidence score you can't threshold, domain shift, and why de-identification is a recall-first problem."
 ---
 
-> A companion to my [NoteGuard one-month retro](https://chaeyoonyunakim.github.io/2026/07/10/noteguard-one-month-retro/).
-> In that post I mentioned "turning on NER" almost in passing. This is the zoom-in: what
-> that actually took, and why the whole system is built so it *doesn't* depend on it.
+> Notes from wiring a Named Entity Recognition layer into a PII-detection pipeline.
+> Light context in my [NoteGuard retro](https://chaeyoonyunakim.github.io/2026/07/10/noteguard-one-month-retro/);
+> this post is the NLP, not the project.
 
-[NoteGuard](https://github.com/chaeyoonyunakim/noteguard-agent)'s job is to strip patient
-identifiers out of NHS clinical free-text *before* an LLM ever sees it. Rules and a
-ground-truth vault get you a long way — NHS numbers, GMC/NMC IDs, postcodes, emails,
-dates. What they can't do is catch a **free-text name the vault has never heard of**:
-"Reviewed by Dr Ethel Joanne Duffy." That's the gap NER fills — and, more importantly,
-here's how I made sure the system doesn't *depend* on it.
+Most PII in structured-ish text has a *format*. NHS numbers, postcodes, emails, phone
+numbers, clinician registration IDs — regex and a dictionary lookup get you very high
+precision *and* recall, because the target is a pattern. The moment you need to redact
+**names in free text**, that whole approach falls over:
 
-## The gap
+- "Match any Title-Case token" over-redacts — half a clinical note is capitalised.
+- A fixed name dictionary (a gazetteer) only knows names you've already seen.
 
-The de-identification core is rules + a vault. The vault is built from the dataset's
-structured tables, so any patient or clinician name that appears there gets redacted
-deterministically. But a discharge note is free text. It's full of names that were never
-in a table:
+Detecting an open class of entities, in context, from tokens with no fixed shape, is a
+**statistical sequence-labelling** problem. That's Named Entity Recognition. Here are the
+practical, transferable things I learned running spaCy NER as that layer — the parts the
+quickstarts skip.
 
-```
-Reviewed by Dr Ethel Joanne Duffy. Nurse Jasmine Freda Murray assessed at triage.
-```
+## Two different problems, two different tools
 
-The rule layer is deliberately **name-agnostic** — it matches formats (NHS numbers,
-postcodes), not arbitrary capitalised words, because "match any Title-Case token" would
-redact half of every clinical note. So those two names sail straight through to the
-model. My trust panel would *report* the leak (that's a separate audit — see the retro),
-but reporting a leak isn't the same as not leaking. I needed something that actually
-recognises names.
+It's worth being explicit about *why* you switch tools, because it's a precision/recall
+story:
 
-That something is **Named Entity Recognition** — and the pragmatic, no-training-required
-option is [Microsoft Presidio](https://microsoft.github.io/presidio/) sitting on top of a
-spaCy model.
+| Target | Nature | Tool | Typical error profile |
+|---|---|---|---|
+| NHS number, postcode, email | Closed, formatted | Regex / rules | ≈0 on well-formed input; misses only malformed cases |
+| Person / location names | Open class, context-dependent | NER (trained model) | Both precision **and** recall < 1 — you *design around* that |
 
-## Rule #1: NER is a *recall boost*, never a hard dependency
+Regex failure is a formatting edge case. NER failure is statistical and constant. Once you
+accept that the name layer will never hit 1.0, the engineering becomes: *choose the
+operating point, then build layers that compensate.*
 
-Before writing a line of it, I set one constraint: **the app must still run, and still
-de-identify, if NER isn't installed at all.** The rule/vault layer is the floor; NER only
-ever raises the ceiling. That constraint shaped everything.
+## The stack: Presidio + spaCy
 
-So NER lives behind a tiny interface with a no-op default:
-
-```python
-class _Detector:
-    """Stub detector — no-op when Presidio/spaCy is not installed."""
-    def detect_persons(self, text: str) -> list[str]:
-        return []
-```
-
-and a builder that upgrades to the real thing *only if it imports cleanly*:
+[Presidio](https://microsoft.github.io/presidio/) is orchestration — it runs a set of
+recognisers over an NLP engine and returns typed spans (`PERSON`, `LOCATION`, …). spaCy is
+the NLP engine doing the actual sequence labelling. One detail that cost me an afternoon:
+if you build `AnalyzerEngine()` with no config, it defaults to expecting spaCy's **large**
+model and fails at *import* time if it's absent. Pin the model explicitly, and make it a
+parameter you can tune:
 
 ```python
-def _build_detector() -> _Detector:
-    try:
-        from presidio_analyzer import AnalyzerEngine
-        from presidio_analyzer.nlp_engine import NlpEngineProvider
+from presidio_analyzer import AnalyzerEngine
+from presidio_analyzer.nlp_engine import NlpEngineProvider
 
-        model = os.getenv("NOTEGUARD_SPACY_MODEL", "en_core_web_md")
-        provider = NlpEngineProvider(nlp_configuration={
-            "nlp_engine_name": "spacy",
-            "models": [{"lang_code": "en", "model_name": model}],
-        })
-        engine = AnalyzerEngine(nlp_engine=provider.create_engine(),
-                                supported_languages=["en"])
-
-        class _PresidioDetector(_Detector):
-            def detect_persons(self, text: str) -> list[str]:
-                results = engine.analyze(text, language="en",
-                                         entities=["PERSON", "LOCATION"])
-                return [text[r.start:r.end] for r in results if r.end > r.start]
-
-        return _PresidioDetector()
-    except Exception:
-        return _Detector()          # graceful fallback — rules + vault still run
+provider = NlpEngineProvider(nlp_configuration={
+    "nlp_engine_name": "spacy",
+    "models": [{"lang_code": "en", "model_name": model}],   # <- a hyperparameter
+})
+engine = AnalyzerEngine(nlp_engine=provider.create_engine(), supported_languages=["en"])
+results = engine.analyze(text, language="en", entities=["PERSON", "LOCATION"])
+spans = [text[r.start:r.end] for r in results]
 ```
 
-That `except Exception: return _Detector()` is the whole philosophy in two lines. CI
-doesn't install NER, so CI runs the stub. My laptop doesn't always have the model, so it
-runs the stub. The deployed image *does* have it, so it runs the real detector. Same code
-path, three environments, zero crashes.
+## Model size is a recall dial, not a detail
 
-### The `NlpEngineProvider` detail that cost me an afternoon
+spaCy's English pipelines (`sm` / `md` / `lg`) differ in size and in whether they ship word
+vectors — and that translates directly into how well they generalise to **names they never
+saw in training** (the whole point). Treat the choice as a hyperparameter you tune against
+a recall target and a deployment budget, not a default you accept.
 
-The naive way to build a Presidio engine is `AnalyzerEngine()` with no arguments. Don't.
-The default configuration wants **`en_core_web_lg`** — a ~560 MB model — and if it's not
-present you get a confusing failure at *import time*, not call time. The fix is to
-configure the NLP engine explicitly with the model you actually shipped, via
-`NlpEngineProvider`. That also makes the model a one-line, env-configurable choice
-(`NOTEGUARD_SPACY_MODEL`), which matters for the next section.
-
-## Shipping it: the `[nlp]` extra + the Docker image
-
-The Python deps are an **optional extra** in `pyproject.toml`, so a plain install stays
-lean and only people who want NER pull the weight:
-
-```toml
-[project.optional-dependencies]
-# pip install -e ".[nlp]"  — Presidio + spaCy NER for free-text PERSON/LOCATION.
-# Also needs a spaCy model:  python -m spacy download en_core_web_md
-nlp = ["presidio-analyzer>=2.2.0", "spacy>=3.7.0,<4"]
-```
-
-The spaCy *model* isn't a normal pip dependency — it's a separate download — so the
-deployed Docker image installs the extra and then fetches the model at build time:
-
-```dockerfile
-RUN pip install --no-cache-dir ... "presidio-analyzer>=2.2.0" "spacy>=3.7.0,<4"
-RUN python -m spacy download en_core_web_md
-ENV NOTEGUARD_SPACY_MODEL=en_core_web_md
-```
-
-Baking the model into the image (rather than downloading at boot) keeps cold starts
-predictable and avoids a runtime network dependency.
-
-## Choosing the model: `sm` vs `md` vs `lg`
-
-This is the decision people hand-wave, so here's the actual data. I ran all three spaCy
-English models on the note that broke things:
+Concretely, on one deliberately awkward sentence:
 
 ```
 "Contacted GP Dr. Ethel Joanne Duffy. Nurse Jasmine Freda Murray reviewed.
  Seen by Dr Sarah Chen."
 
-en_core_web_sm  → ['Ethel Joanne Duffy', 'Murray', 'Sarah Chen']
-en_core_web_md  → ['Ethel Joanne Duffy', 'Nurse Jasmine', 'Freda Murray', 'Sarah Chen']
+en_core_web_sm  (~12 MB) → ['Ethel Joanne Duffy', 'Murray', 'Sarah Chen']
+en_core_web_md  (~40 MB) → ['Ethel Joanne Duffy', 'Nurse Jasmine', 'Freda Murray', 'Sarah Chen']
+en_core_web_lg  (~560 MB) → better still
 ```
 
-- **`sm`** (~12 MB) caught "Ethel Joanne Duffy" fully but only picked up **"Murray"** from
-  the second name — leaving "Jasmine Freda" exposed.
-- **`md`** (~40 MB) covered the second full surname (across two spans) — meaningfully
-  better recall.
-- **`lg`** (~560 MB) is better still, but it's **~14× the size** of `md` for a demo Space.
+`sm` caught one full name but only the surname of the second person — "Jasmine Freda" would
+have leaked. `md` covered both. For a recall-sensitive task that difference is the whole
+game, and `md` was the sweet spot: meaningfully better than `sm`, ~14× smaller than `lg`.
+The right framing: **recall vs. footprint vs. latency** is a curve, and you pick a point on
+it on purpose.
 
-`md` is the sweet spot: materially better recall than `sm`, a fraction of `lg`. And
-because the model is env-configurable, anyone who wants maximum recall can set
-`NOTEGUARD_SPACY_MODEL=en_core_web_lg` and bake that in instead. Recall/size is a dial,
-not a hard-coded decision.
+## Gotcha 1 — the confidence score you can't threshold
 
-## The gotcha reel
+The instinctive next move is "only redact if confidence > 0.x". It doesn't work here.
+Presidio's spaCy recogniser assigns every entity a **flat score (0.85)** — a correct name
+and a garbage detection come back *identical*. spaCy's NER doesn't surface calibrated
+per-span probabilities on that path, so there's nothing real to rank by.
 
-NER is not a "drop it in and you're done" component. Three things bit me:
+The lesson generalises: **before you design confidence-based logic, check whether your
+model actually emits a meaningful confidence.** A lot of NLP components return a constant or
+an uncalibrated proxy. If you can't threshold, you filter on *other* signals — gazetteers,
+context words, POS, or a downstream rule — not on the score.
 
-### 1. Presidio scores every spaCy entity the *same*
-I assumed I could filter false positives by confidence. Nope — Presidio assigns spaCy
-entities a **flat 0.85 score**. A real name and a garbage detection get the *identical*
-score, so a threshold buys you nothing. This is important to know before you design any
-"only redact if confidence > X" logic: with the spaCy recogniser, there is no X.
+## Gotcha 2 — spans and tokenisation, not just labels
 
-### 2. It thinks clinical abbreviations are people
-`en_core_web_md` confidently tagged **"Subcut"** (subcutaneous) as a `PERSON`. So the
-de-id turned "Subcut emphysema" into "`[PERSON_3]` emphysema" — safe, but wrong and noisy.
-With no confidence signal to lean on (see #1), the pragmatic fix is a small
-**clinical-term allow-list** applied at the detector boundary:
+NER returns **character offsets**, and multi-token names don't always come back as one
+clean span. Above, `md` split the second person into `'Nurse Jasmine'` + `'Freda Murray'` —
+it even swallowed the role word "Nurse". If your redaction replaces detected spans in place,
+partial coverage means partial leaks, and boundary slop means you sometimes delete a
+non-name token. Span alignment and tokenisation quietly matter more than the entity label
+you were focused on. Budget for a pass that reconciles overlapping/partial spans, and an
+independent check for whatever the spans missed.
+
+## Gotcha 3 — domain shift is why "Subcut" becomes a person
+
+spaCy's English models are trained on web/news text (OntoNotes), not clinical notes. Run
+them on hospital prose and you get systematic, *confident* errors on domain vocabulary: the
+abbreviation **"Subcut"** (subcutaneous) gets tagged `PERSON`. This is textbook **domain
+shift** — a model evaluated outside its training distribution fails in structured ways on
+in-domain jargon.
+
+Your options are the usual domain-adaptation ladder:
+
+1. **Train / fine-tune** an in-domain NER model — best, most expensive.
+2. **Swap to a domain model** — e.g. a clinical de-id transformer trained on i2b2 —
+   better in-domain, heavier, and often US-centric.
+3. **Patch with a gazetteer / stop-list** — cheap, explainable, incomplete:
 
 ```python
 _NER_STOPWORDS = frozenset({"subcut", "subcutaneous", "obs", "sats", "nad",
                             "afebrile", "pneumomediastinum", ...})
 
-@staticmethod
-def _detect_names(text: str) -> list[str]:
-    return [n for n in _DETECTOR.detect_persons(text)
-            if n and len(n) > 2 and n.lower() not in _NER_STOPWORDS]
+def detect_names(text):
+    return [n for n in ner_persons(text)
+            if len(n) > 2 and n.lower() not in _NER_STOPWORDS]
 ```
 
-It's a stop-list, so it's inherently incomplete — but it's targeted, explainable, and it
-never touches a real name.
+Note what that stop-list *is*: a small **precision repair** bolted onto a **recall-oriented**
+model. Which is the theme of the whole post.
 
-### 3. NER makes your tests non-deterministic
-The moment NER is installed, `deidentify()` output depends on whether the model is
-present — which breaks unit tests that assume the rule/vault layer in isolation. The fix
-is an autouse fixture that pins the stub by default, so the suite is deterministic whether
-or not the `[nlp]` extra is installed; the one NER-path test injects its own fake detector
-on top. Tests should test the layer they mean to test.
+## Gotcha 4 — a model in the loop makes tests non-deterministic
 
-## Where NER sits in the stack
+The moment detection depends on whether a model is installed/loaded, the unit tests for your
+*deterministic* layers (the regex rules) start depending on it too, and go flaky across
+environments. Standard fix for ML-in-the-loop code: **stub the model by default** in the
+test suite (an autouse fixture pinning a no-op detector), and inject a fake only in the one
+test that exercises the NER path. Test each layer as the thing it actually is.
 
-The thing I'd most want a past-me to internalise: **NER is one layer of four, and it's the
-only probabilistic one.** The design leans on that:
+## The asymmetry that should drive your evaluation
 
-| Layer | Kind | Job |
-|---|---|---|
-| Rules + vault | Deterministic | NHS numbers, IDs, known names — exact, measurable |
-| **Presidio NER** | **Probabilistic** | **Free-text names the vault never saw — recall boost** |
-| `scan_pii` audit | Deterministic, high-precision | Reports anything that *still* leaked (incl. NER's misses) |
-| `assert_clean()` | Hard gate | Raises before the model sees anything with a known identifier |
+De-identification has a lopsided cost function. A **false negative** (a missed name) is a
+privacy leak. A **false positive** (over-redaction) is just noise in the output. Those are
+not equally bad, so you don't optimise F1 — you optimise **recall first**, accept the
+precision hit, then buy precision back cheaply (stop-lists) and cover the recall gap with an
+independent audit that flags anything suspicious that survived.
 
-NER improves the *odds*. The audit tells the truth about what got through. The gate is the
-guarantee. If NER were the guarantee, a single missed name would be a silent PHI leak — so
-it isn't, and it never will be.
+Practically, that means your eval report should lead with **recall on names**, not a single
+aggregate F1 — and it should be **stratified**, which brings up the part that's easy to skip.
 
-## The honest limitation
+## Recall is not uniform — measure it by subgroup
 
-`en_core_web_md` is trained largely on Western/English text, so **name recall is lower for
-names of non-English origin.** In a de-identification tool, under-detection isn't a neutral
-miss — it means those patients carry a *higher* residual re-identification risk. That's an
-equity problem, not a footnote. My mitigations are the deterministic vault (which doesn't
-care about a name's origin), the `scan_pii` audit that *surfaces* residual names to the
-clinician rather than hiding the gap, and a plan to evaluate recall **stratified by name
-origin** before this ever touches real Trust data. Naming the limitation out loud is part
-of the job.
+Because these models are trained largely on Western/English text, **recall is lower for
+names of non-English origin.** In a redaction task that's not a neutral miss: those people
+carry a *higher* residual re-identification risk than everyone else. It's a fairness problem
+hiding inside an aggregate metric. As a data scientist the obligation is concrete — don't
+report one recall number; **stratify recall by name origin** and report the spread.
+Mitigations are gazetteers for known local names, multilingual/clinical models, and simply
+saying the limitation out loud.
+
+## The transferable shape
+
+Strip the domain away and the design is reusable for any PII / entity-extraction pipeline:
+
+```
+deterministic rules  →  probabilistic NER  →  high-precision audit  →  hard gate
+(formatted IDs)         (open-class names,     (catches what NER        (the guarantee;
+                         recall boost)          missed, precisely)       never the model)
+```
+
+NER is the only probabilistic component, so it's the one thing you never let *be* the
+guarantee — you let it improve the odds, and you put a deterministic check on either side of
+it. That framing — recall-oriented model in the middle, precision repair and a hard gate
+around it — is the part I'd carry to the next text-extraction problem, clinical or not.
 
 ## Takeaways
 
-- **Make NER optional.** Graceful fallback to the rule layer means one code path across
-  CI, local, and prod — and no crash when the model isn't there.
-- **Configure the spaCy model explicitly** (`NlpEngineProvider`) instead of letting
-  Presidio default to `lg`, and make it an env var so recall/size is a dial.
-- **You can't threshold spaCy confidence** in Presidio — plan for an allow-list, not a
-  cutoff.
-- **NER recalls; it doesn't guarantee.** Pair it with a precise audit and a hard gate, and
-  be honest about whose names it misses.
-
-*This is a companion to the [NoteGuard one-month retro](https://chaeyoonyunakim.github.io/2026/07/10/noteguard-one-month-retro/).
-Code on [GitHub](https://github.com/chaeyoonyunakim/noteguard-agent); live on Hugging Face Spaces.*
+- **Model size is a recall hyperparameter** — pick a point on the recall/footprint curve on
+  purpose; don't accept a default.
+- **Don't build on a confidence score you haven't verified is calibrated** — Presidio's
+  spaCy score is a flat constant.
+- **Expect domain shift** — repair precision with gazetteers, chase recall with a better/
+  in-domain model.
+- **Tune recall-first for PII**, and report recall **stratified by subgroup**, not a single F1.
+- **Stub models in tests** so your deterministic layers stay deterministic.
