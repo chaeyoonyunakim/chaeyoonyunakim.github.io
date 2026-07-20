@@ -190,6 +190,12 @@ stays in the loop and signs off every summary. NoteGuard doesn't remove the huma
 just makes sure the machine only ever sees what it's allowed to — and, now, tells the
 truth about whether it did.
 
+## Further reading
+
+- [**Where Regex Ends: Practical NER for PII in Free Text**](https://chaeyoonyunakim.github.io/2026/07/17/where-regex-ends-ner-for-pii/)
+  — a technical zoom-in on the NER layer I mention above: Presidio + spaCy, model size as a
+  recall dial, and why de-identification is a recall-first problem.
+
 *Built with a de-identification core, LangGraph + Gemini, Tavily for public-guidance
 grounding, and a lot of screenshots. Live on Hugging Face Spaces; code on
 [GitHub](https://github.com/chaeyoonyunakim/noteguard-agent).*
